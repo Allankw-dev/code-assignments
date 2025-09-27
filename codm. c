@@ -1,0 +1,108 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ctype.h>
+
+#define SIZE 7
+#define BULLETS 15
+
+typedef struct {
+    int row, col;
+    int bullets;
+    int score;
+} Player;
+
+typedef struct {
+    int row, col;
+} Target;
+
+Player player;
+Target target;
+
+void clear_screen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+void init_game() {
+    player.row = SIZE / 2;
+    player.col = SIZE / 2;
+    player.bullets = BULLETS;
+    player.score = 0;
+    target.row = rand() % SIZE;
+    target.col = rand() % SIZE;
+}
+
+void draw_board() {
+    for (int r = 0; r < SIZE; r++) {
+        for (int c = 0; c < SIZE; c++) {
+            if (r == player.row && c == player.col) printf("P ");
+            else if (r == target.row && c == target.col) printf("X ");
+            else printf(". ");
+        }
+        printf("\n");
+    }
+    printf("Bullets: %d | Score: %d\n", player.bullets, player.score);
+}
+
+void move_player(char cmd) {
+    if (cmd == 'w' && player.row > 0) player.row--;
+    else if (cmd == 's' && player.row < SIZE - 1) player.row++;
+    else if (cmd == 'a' && player.col > 0) player.col--;
+    else if (cmd == 'd' && player.col < SIZE - 1) player.col++;
+}
+
+void shoot() {
+    if (player.bullets <= 0) {
+        printf("Out of bullets!\n");
+        return;
+    }
+    player.bullets--;
+
+    if (player.row == target.row || player.col == target.col) {
+        printf("🎯 HIT! Target down!\n");
+        player.score += 10;
+        target.row = rand() % SIZE;
+        target.col = rand() % SIZE;
+    } else {
+        printf("💨 Missed!\n");
+    }
+}
+
+void move_target() {
+    int dir = rand() % 4;
+    if (dir == 0 && target.row > 0) target.row--;
+    else if (dir == 1 && target.row < SIZE - 1) target.row++;
+    else if (dir == 2 && target.col > 0) target.col--;
+    else if (dir == 3 && target.col < SIZE - 1) target.col++;
+}
+
+int main() {
+    srand(time(NULL));
+    init_game();
+
+    char cmd;
+    while (player.bullets > 0) {
+        clear_screen();
+        printf("=== Shooting Game ===\n");
+        draw_board();
+        printf("Move: W/A/S/D | Fire: F | Quit: Q\n");
+        printf("Command: ");
+        scanf(" %c", &cmd);
+        cmd = tolower(cmd);
+
+        if (cmd == 'q') break;
+        else if (cmd == 'f') shoot();
+        else move_player(cmd);
+
+        move_target();
+    }
+
+    printf("\n=== Game Over ===\n");
+    printf("Final Score: %d\n", player.score);
+    return 0;
+}
