@@ -1,0 +1,92 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ESpaceWebServerManagement {
+    public static void main(String[] args) {
+        
+        JFrame frame = new JFrame("E-Space: Web Server Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(700, 400);
+        frame.setLayout(new BorderLayout());
+
+        
+        String[] columns = {"Server Name", "IP Address", "Location", "Owner"};
+
+        
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        model.addRow(new Object[]{"MainServer", "192.168.1.1", "New York, USA", "TechCorp"});
+        model.addRow(new Object[]{"BackupServer", "192.168.1.2", "Los Angeles, USA", "WebHost"});
+        model.addRow(new Object[]{"CloudServer", "10.0.0.1", "London, UK", "CloudTech"});
+
+        
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane, BorderLayout.CENTER);
+
+        
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(2, 5, 5, 5));
+
+        JTextField serverField = new JTextField();
+        JTextField ipField = new JTextField();
+        JTextField locationField = new JTextField();
+        JTextField ownerField = new JTextField();
+        JButton addButton = new JButton("Add Server");
+        JButton deleteButton = new JButton("Delete Server");
+
+        inputPanel.add(new JLabel("Server Name:"));
+        inputPanel.add(serverField);
+        inputPanel.add(new JLabel("IP Address:"));
+        inputPanel.add(ipField);
+        inputPanel.add(addButton);
+        
+        inputPanel.add(new JLabel("Location:"));
+        inputPanel.add(locationField);
+        inputPanel.add(new JLabel("Owner:"));
+        inputPanel.add(ownerField);
+        inputPanel.add(deleteButton);
+
+        frame.add(inputPanel, BorderLayout.SOUTH);
+
+        // Action Listener for "Add Server" Button
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String server = serverField.getText();
+                String ip = ipField.getText();
+                String location = locationField.getText();
+                String owner = ownerField.getText();
+
+                if (!server.isEmpty() && !ip.isEmpty() && !location.isEmpty() && !owner.isEmpty()) {
+                    model.addRow(new Object[]{server, ip, location, owner});
+                    serverField.setText("");
+                    ipField.setText("");
+                    locationField.setText("");
+                    ownerField.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please fill all fields!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    model.removeRow(selectedRow);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please select a server to delete!", "Delete Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        
+        frame.setVisible(true);
+    }
+}
+
